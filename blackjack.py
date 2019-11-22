@@ -33,7 +33,7 @@ class Card:
             self.value = self.get_value()
 
     def get_value(self):
-        if self.rank == 'Ace':
+        if self.rank == 'A':
             return 11
         return 10
 
@@ -48,7 +48,7 @@ class Deck:
         ]
         self.suits = suits
         self.cards = [Card(rank, suit)
-                      for rank in ['A', 2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K'] for suit in suits]
+                      for rank in ['A', 2, 3, 4, 5, 6, 7, 8, 9, 'X', 'J', 'Q', 'K'] for suit in suits]
         self.used_cards = []
         self.shuffle()
 
@@ -84,12 +84,17 @@ class Dealer:
 
     def show(self, init=False):
         if not init:
-            print('Dealer: [' + ', '.join([f'{card.suit.color}{Back.WHITE}{card.rank}{card.suit.symbol}{Style.RESET_ALL}' for card in self.hand]
-                                          ) + ']', '=', self.get_hand_sum())
+            print(' '.join([f'{card.suit.color}{Back.WHITE}{card.rank}  {Style.RESET_ALL}' for card in self.hand]
+                           ))
+            print(' '.join([f'{card.suit.color}{Back.WHITE} {card.suit.symbol} {Style.RESET_ALL}' for card in self.hand]
+                           ) + f' = {self.get_hand_sum()}')
+            print(' '.join([f'{card.suit.color}{Back.WHITE}  {card.rank}{Style.RESET_ALL}' for card in self.hand]
+                           ))
             return
         card = self.hand[0]
-        print(
-            f'Dealer: [{card.suit.color}{Back.WHITE}{card.rank}{card.suit.symbol}{Style.RESET_ALL}]')
+        print(f'{card.suit.color}{Back.WHITE}{card.rank}  {Style.RESET_ALL} {Fore.BLACK}{Back.GREEN}* *{Style.RESET_ALL}')
+        print(f'{card.suit.color}{Back.WHITE} {card.suit.symbol} {Style.RESET_ALL} {Fore.BLACK}{Back.GREEN} * {Style.RESET_ALL} = {card.value}')
+        print(f'{card.suit.color}{Back.WHITE}  {card.rank}{Style.RESET_ALL} {Fore.BLACK}{Back.GREEN}* *{Style.RESET_ALL}')
 
     def hasBlackjack(self):
         return self.get_hand_sum() == 21
@@ -128,8 +133,12 @@ class Player:
                         return
 
     def show(self):
-        print('Player: [' + ', '.join([f'{card.suit.color}{Back.WHITE}{card.rank}{card.suit.symbol}{Style.RESET_ALL}' for card in self.hand]
-                                      ) + ']', '=', self.get_hand_sum())
+        print(' '.join(
+            [f'{card.suit.color}{Back.WHITE}{card.rank}  {Style.RESET_ALL}' for card in self.hand]))
+        print(' '.join(
+            [f'{card.suit.color}{Back.WHITE} {card.suit.symbol} {Style.RESET_ALL}' for card in self.hand]) + f' = {self.get_hand_sum()}')
+        print(' '.join(
+            [f'{card.suit.color}{Back.WHITE}  {card.rank}{Style.RESET_ALL}' for card in self.hand]))
 
     def hasBlackjack(self):
         return self.get_hand_sum() == 21
@@ -180,13 +189,15 @@ class Game:
 
     def display(self, first=False, win=False, playing=False):
         os.system('clear')
+        print()
+        self.dealer.show(first)
+        print()
+        self.player.show()
+        print('\n')
         if not win:
             print(
                 f'Money: ${self.player.money + (self.player.bet if playing else 0)}')
             print(f'Current bet: ${self.player.bet}\n')
-        self.dealer.show(first)
-        self.player.show()
-        print()
 
     def hit(self):
         self.player.draw(self.deck)
