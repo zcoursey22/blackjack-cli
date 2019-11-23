@@ -10,6 +10,11 @@ from colorama import Fore, Back, Style
 # 2:1 payout for blackjack
 
 # TODO
+# Add typewriter effect
+# Animate card flip
+# Add time delay to drawing
+# Improve selction/input with library
+# Rework UX of exiting
 # Split
 # Surrender
 # Insurance
@@ -82,12 +87,28 @@ class Dealer:
     def get_hand_sum(self):
         return sum([card.value for card in self.hand])
 
-    def show(self, init=False):
+    def get_soft_sum(self, for_print=False, win=False):
+        has_hard_ace = True if len(
+            [card for card in self.hand if card.value == 11]) > 0 else False
+        hard_sum = self.get_hand_sum()
+        if has_hard_ace:
+            soft_sum = hard_sum - 10
+            if for_print:
+                if win:
+                    return ''
+                return f' (or {soft_sum})'
+            return soft_sum
+        else:
+            if for_print:
+                return ''
+            return hard_sum
+
+    def show(self, init=False, win=False):
         if not init:
             print(' '.join([f'{card.suit.color}{Back.WHITE}{card.rank}  {Style.RESET_ALL}' for card in self.hand]
                            ))
             print(' '.join([f'{card.suit.color}{Back.WHITE} {card.suit.symbol} {Style.RESET_ALL}' for card in self.hand]
-                           ) + f' = {self.get_hand_sum()}')
+                           ) + f' = {self.get_hand_sum()}{self.get_soft_sum(True, win)}')
             print(' '.join([f'{card.suit.color}{Back.WHITE}  {card.rank}{Style.RESET_ALL}' for card in self.hand]
                            ))
             return
@@ -118,6 +139,22 @@ class Player:
     def get_hand_sum(self):
         return sum([card.value for card in self.hand])
 
+    def get_soft_sum(self, for_print=False, win=False):
+        has_hard_ace = True if len(
+            [card for card in self.hand if card.value == 11]) > 0 else False
+        hard_sum = self.get_hand_sum()
+        if has_hard_ace:
+            soft_sum = hard_sum - 10
+            if for_print:
+                if win:
+                    return ''
+                return f' (or {soft_sum})'
+            return soft_sum
+        else:
+            if for_print:
+                return ''
+            return hard_sum
+
     def draw(self, deck, init=False):
         if not init:
             self.hand.append(deck.draw_card())
@@ -132,11 +169,11 @@ class Player:
                     if self.get_hand_sum() <= 21:
                         return
 
-    def show(self):
+    def show(self, win=False):
         print(' '.join(
             [f'{card.suit.color}{Back.WHITE}{card.rank}  {Style.RESET_ALL}' for card in self.hand]))
         print(' '.join(
-            [f'{card.suit.color}{Back.WHITE} {card.suit.symbol} {Style.RESET_ALL}' for card in self.hand]) + f' = {self.get_hand_sum()}')
+            [f'{card.suit.color}{Back.WHITE} {card.suit.symbol} {Style.RESET_ALL}' for card in self.hand]) + f' = {self.get_hand_sum()}{self.get_soft_sum(True, win)}')
         print(' '.join(
             [f'{card.suit.color}{Back.WHITE}  {card.rank}{Style.RESET_ALL}' for card in self.hand]))
 
@@ -190,9 +227,9 @@ class Game:
     def display(self, first=False, win=False, playing=False):
         os.system('clear')
         print()
-        self.dealer.show(first)
+        self.dealer.show(first, win)
         print()
-        self.player.show()
+        self.player.show(win)
         print('\n')
         if not win:
             print(
