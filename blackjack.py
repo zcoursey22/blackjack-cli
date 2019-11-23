@@ -11,8 +11,6 @@ import math
 # 2:1 payout for blackjack
 
 # TODO
-# Add time delay to drawing
-# Animate card flip
 # Improve selction/input with library
 # Rework UX of exiting
 # Split
@@ -22,16 +20,17 @@ import math
 
 CARD_BACK_COLOR = Back.GREEN
 TYPEWRITE_EFFECT = True
-TYPEWRITE_MIN_SPEED = 0.01
-TYPEWRITE_SPEED = 15
+TYPEWRITE_MIN_SPEED = 0.005
+TYPEWRITE_SPEED = 20
+TYPEWRITE_CARD_SPEED = TYPEWRITE_SPEED * 6
 
 
-def typewrite(s, end='\n'):
+def typewrite(s, end='\n', speed=TYPEWRITE_SPEED):
     if TYPEWRITE_EFFECT:
         n = len(s)
         for c in s:
             time.sleep(min(TYPEWRITE_MIN_SPEED,
-                           math.log(n) / n / TYPEWRITE_SPEED))
+                           math.log(n) / n / speed))
             print(c, end='', flush=True)
         print(end, end='')
     else:
@@ -122,19 +121,21 @@ class Dealer:
 
     def show(self, init=False, win=False):
         if not init:
-            print(' '.join([f'{card.suit.color}{Back.WHITE}{f"10 " if card.rank == 10 else f"{card.rank}  "}{Style.RESET_ALL}' for card in self.hand]
-                           ))
-            print(' '.join([f'{card.suit.color}{Back.WHITE} {card.suit.symbol} {Style.RESET_ALL}' for card in self.hand]
-                           ) + f' = {self.get_hand_sum()}{self.get_soft_sum(True, win)}')
-            print(' '.join([f'{card.suit.color}{Back.WHITE}{f" 10" if card.rank == 10 else f"  {card.rank}"}{Style.RESET_ALL}' for card in self.hand]
-                           ))
+            typewrite(' '.join([f'{card.suit.color}{Back.WHITE}{f"10 " if card.rank == 10 else f"{card.rank}  "}{Style.RESET_ALL}' for card in self.hand]
+                               ), speed=TYPEWRITE_CARD_SPEED)
+            typewrite(' '.join([f'{card.suit.color}{Back.WHITE} {card.suit.symbol} {Style.RESET_ALL}' for card in self.hand]
+                               ) + f' = {self.get_hand_sum()}{self.get_soft_sum(True, win)}', speed=TYPEWRITE_CARD_SPEED)
+            typewrite(' '.join([f'{card.suit.color}{Back.WHITE}{f" 10" if card.rank == 10 else f"  {card.rank}"}{Style.RESET_ALL}' for card in self.hand]
+                               ), speed=TYPEWRITE_CARD_SPEED)
             return
         card = self.hand[0]
         top_row = f"10 " if card.rank == 10 else f"{card.rank}  "
         bottom_row = f" 10" if card.rank == 10 else f"  {card.rank}"
-        print(f'{card.suit.color}{Back.WHITE}{top_row}{Style.RESET_ALL} {Fore.BLACK}{CARD_BACK_COLOR}* *{Style.RESET_ALL}')
-        print(f'{card.suit.color}{Back.WHITE} {card.suit.symbol} {Style.RESET_ALL} {Fore.BLACK}{CARD_BACK_COLOR} * {Style.RESET_ALL} = {card.value}')
-        print(f'{card.suit.color}{Back.WHITE}{bottom_row}{Style.RESET_ALL} {Fore.BLACK}{CARD_BACK_COLOR}* *{Style.RESET_ALL}')
+        typewrite(
+            f'{card.suit.color}{Back.WHITE}{top_row}{Style.RESET_ALL} {Fore.BLACK}{CARD_BACK_COLOR}* *{Style.RESET_ALL}', speed=TYPEWRITE_CARD_SPEED)
+        typewrite(f'{card.suit.color}{Back.WHITE} {card.suit.symbol} {Style.RESET_ALL} {Fore.BLACK}{CARD_BACK_COLOR} * {Style.RESET_ALL} = {card.value}', speed=TYPEWRITE_CARD_SPEED)
+        typewrite(
+            f'{card.suit.color}{Back.WHITE}{bottom_row}{Style.RESET_ALL} {Fore.BLACK}{CARD_BACK_COLOR}* *{Style.RESET_ALL}', speed=TYPEWRITE_CARD_SPEED)
 
     def hasBlackjack(self):
         return self.get_hand_sum() == 21
@@ -189,12 +190,12 @@ class Player:
                         return
 
     def show(self, win=False):
-        print(' '.join(
-            [f'{card.suit.color}{Back.WHITE}{f"10 " if card.rank == 10 else f"{card.rank}  "}{Style.RESET_ALL}' for card in self.hand]))
-        print(' '.join(
-            [f'{card.suit.color}{Back.WHITE} {card.suit.symbol} {Style.RESET_ALL}' for card in self.hand]) + f' = {self.get_hand_sum()}{self.get_soft_sum(True, win)}')
-        print(' '.join(
-            [f'{card.suit.color}{Back.WHITE}{f" 10" if card.rank == 10 else f"  {card.rank}"}{Style.RESET_ALL}' for card in self.hand]))
+        typewrite(' '.join(
+            [f'{card.suit.color}{Back.WHITE}{f"10 " if card.rank == 10 else f"{card.rank}  "}{Style.RESET_ALL}' for card in self.hand]), speed=TYPEWRITE_CARD_SPEED)
+        typewrite(' '.join(
+            [f'{card.suit.color}{Back.WHITE} {card.suit.symbol} {Style.RESET_ALL}' for card in self.hand]) + f' = {self.get_hand_sum()}{self.get_soft_sum(True, win)}', speed=TYPEWRITE_CARD_SPEED)
+        typewrite(' '.join(
+            [f'{card.suit.color}{Back.WHITE}{f" 10" if card.rank == 10 else f"  {card.rank}"}{Style.RESET_ALL}' for card in self.hand]), speed=TYPEWRITE_CARD_SPEED)
 
     def hasBlackjack(self):
         return self.get_hand_sum() == 21
