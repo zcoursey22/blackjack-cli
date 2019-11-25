@@ -18,6 +18,7 @@ import math
 # Insurance
 # Settings menu for changing rules, etc.
 
+DEFAULT_MONEY = 250
 CARD_BACK_COLOR = Back.GREEN
 TYPEWRITE_EFFECT = True
 TYPEWRITE_MIN_SPEED = 0.005
@@ -151,10 +152,10 @@ class Player:
                 self.money = db['money']
                 self.rounds_played = db['rounds_played']
             except:
-                self.money = 250
+                self.money = DEFAULT_MONEY
                 self.rounds_played = 0
             if self.money == 0:
-                self.money = 250
+                self.money = DEFAULT_MONEY
 
     def get_hand_sum(self):
         return sum([card.value for card in self.hand])
